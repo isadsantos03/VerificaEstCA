@@ -1,58 +1,102 @@
-import tkinter as tk
+import tkinter as tela
 from tkinter import ttk  # Importa caixas de seleção
+from math import isfinite
 
-# Cria janela principal
-viga = tk.Tk()
-viga.title("VIGA")
+# Cria a janela principal
+janela = tela.Tk()
+janela.title("INTERFACE PARA CÁLCULO DE VIGAS")
 
-# Lista com itens que o usuário deve preencher
+# Lista de itens que o usuário deve preencher
 campos = [
-    "Vão da Viga (m):",
     "Largura da Seção - bw (cm):",
     "Altura da Seção - h (cm):",
-    "Cobrimento (cm):",
-    "Resistência do Concreto - fck (MPa):",
-    "Carregamento (kN/m):"]
+    "Altura útil - d (cm):",
+    "Distância da fibra comprimida ao CG - d' (cm):",
+    "Cobrimento - c (cm):",
+    "Resistência Característica do Concreto - fck (MPa):",
+    "Momento de Cálculo - Mk (kN*cm):"]
 
+# Lista de mensagens de erro para cada campo
+erro = [
+    "⚠️ Erro: Digite apenas números positivos!",                # bw
+    "⚠️ Erro: Digite apenas números positivos!",                # h
+    "⚠️ Erro: Digite apenas números positivos!",                # d
+    "⚠️ Erro: Digite apenas números positivos!",                # d'
+    "⚠️ Erro: Digite apenas números positivos!",                # c
+    "⚠️ Erro: Digite um valor entre o intervalo de 20 e 90!",   # fck
+    "⚠️ Erro: Digite um número e diferente de zero!",           # Mk
+    "⚠️ Erro: É preciso selecionar uma opção!",                 # fyk
+]
+
+# Lista de constantes para o cálculo
+constantes = [
+    1.4,      #Yc
+    1.15,     #Ys
+    1.4,      #Yf 
+    210000,   #Es
+    0.15,     #Pmin,abs
+    4,        #(As+A'smax)
+]
+
+# Listas que serão utilizadas no decorrer do código
 entradas = []
+viga = []
+avisos = []
 
-# Cria texto e caixa vazia
+#EXECUÇÃO DO PROGRAMA
+
+# Cria os textos e caixas vazias
 for i, txt in enumerate(campos):
-  tk.Label(viga, text=txt).pack()
-  e = tk.Entry(viga)
-  e.pack()
-  entradas.append(e)  # Guarda a caixinha na lista
+  tela.Label(janela, text=txt).pack()
+  campo_digitação = tela.Entry(janela)
+  campo_digitação.pack()
+  entradas.append(campo_digitação)  # Guarda a caixinha na lista
 
-# Para o fck, verificar preenchimento
-  if i == 4:
-    aviso_fck = tk.Label(viga, text="", fg="red", font=("Arial", 8))
-    aviso_fck.pack()
+  aviso = tela.Label(janela, text="", fg="red", font=("Arial", 8))
+  aviso.pack()
+  avisos.append(aviso) # Guarda o aviso na lista
 
 # Opções classe do aço
-tk.Label(viga, text="Classe do Aço:").pack()
+tela.Label(janela, text="Resistência de Escoamento do Aço - fyk (MPa):").pack()
 # Cria a caixa com opções
-opção_aco = ttk.Combobox(viga, values=["CA-50", "CA-60"], state="readonly")
-opção_aco.pack()
+opcao_aco = ttk.Combobox(janela, values=["CA-50", "CA-60"], state="readonly")
+opcao_aco.pack()
+aviso_aco = tela.Label(janela, text="", fg="red", font=("Arial", 8))
+aviso_aco.pack()
 
 # Botão executado
 def clicar():
-  try:
-    # Lê o valor do fck e transforma em número decimal
-    fck_valor = float(entradas[4].get())
 
-    # Verifica se está no intervalo permitido
-    if fck_valor < 20 or fck_valor > 90:
-      aviso_fck.config(text="⚠️ Atenção: O fck deve estar entre 20 e 90 MPa!")
-    else:
-      aviso_fck.config(text="")  # Limpa o aviso se estiver tudo certo
+  valores = []
 
-  except ValueError:
-    # Se o utilizador escrever letras em vez de números
-    aviso_fck.config(text="⚠️ Erro: Digite apenas números!")
+  for i, campo in enumerate(entradas):
+    try:
+      valor = float(campo.get())
+    except ValueError:
+      avisos[i].config(text=erro[i])  # Mostra o erro correspondente
+      continue
+
+    if not isfinite(valor) or (i <= 4 and valor <=0) or (i == 5 and not 20<= valor <=90) or (i == 6 and valor == 0):
+      avisos[i].config(text=erro[i])  # Mostra o erro correspondente
+      continue
+
+    avisos[i].config(text="")
+    valores.append(valor)
+
+  classe_aco = opcao_aco.get()
+  if not classe_aco:
+    aviso_aco.config(text=erro[7])
+    return
+
+  aviso_aco.config(text="")
+
+  if len(valores) == len(entradas):
+    valores.append(classe_aco)
+    viga[:] = valores
 
 # Cria o botão
-tk.Button(
-    viga, text="Ok", bg="green", fg="white", font=("Arial", 12, "bold"), command=clicar
+tela.Button(
+    janela, text="Ok", bg="green", fg="white", font=("Arial", 12, "bold"), command=clicar
 ).pack(pady=15)
 
-viga.mainloop()
+janela.mainloop()
