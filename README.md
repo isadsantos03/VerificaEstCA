@@ -7,7 +7,7 @@
 
 O projeto aborda a dificuldade e o tempo necessário para realizar o pré-dimensionamento e o dimensionamento de vigas de concreto armado, especialmente devido à necessidade de executar cálculos repetitivos e verificar diferentes parâmetros. O objetivo é desenvolver um programa computacional com interface gráfica que automatize essas etapas, servindo principalmente como ferramenta de auxílio didático para estudantes e professores de Engenharia Civil, além de auxiliar profissionais da área.
 
-As principais funcionalidades incluem a inserção de dados geométricos, propriedades dos materiais e carregamentos; o cálculo das armaduras longitudinais e transversais; a verificação dos limites normativos de armaduras e espaçamentos; e a geração de relatórios de cálculo em PDF.
+As principais funcionalidades incluem a inserção de dados geométricos, propriedades dos materiais e carregamentos; o cálculo das armaduras longitudinais; a verificação dos limites normativos de armaduras; e a geração de relatórios de cálculo.
 
 ## Instalação
 
@@ -21,11 +21,11 @@ poetry install
 
 ## Uso
 
-O usuário iniciará o programa e preencherá os campos da interface gráfica com os dados da viga, incluindo o vão, a largura da seção transversal, o cobrimento, a resistência do concreto, a classe do aço e os carregamentos atuantes. Com base no vão informado, o programa apresentará opções de altura para a viga. Após selecionar uma das opções, o usuário poderá executar o pré-dimensionamento e o dimensionamento à flexão e ao cisalhamento. O programa calculará as áreas de armadura longitudinal e transversal necessárias e verificará os limites normativos previstos no projeto. Ao final, os resultados serão apresentados na interface, com alertas para eventuais irregularidades, e poderão ser exportados em um relatório de cálculo em PDF.
+O usuário iniciará o programa e preencherá os campos da interface gráfica com os dados da viga, conforme informado na primeira tela exibida. Com base nos valores informados na primeira tela, o programa executará uma série de comandos e equações afim de apresentar os parâmetros associados àquela viga de concreto armado. Neste instante, o usuário pode retroceder ou avançar na operação do programa conforme sua própria vontade. Caso retroceda, retorna a tela inicial para reinserção dos dados solicitados. Se optar por avançar, o programa calculará as áreas de armadura longitudinal necessárias e verificará os limites normativos previstos no projeto. Ao final, os resultados são apresentados na tela para que o usuário possa conferir as mais relevantes informações para o cenário estipulado pelo usuário..
 
 # Exemplo de uso
 
-Como exemplo de uso, o usuário poderá informar o vão da viga, definir sua largura e inserir as propriedades dos materiais e os carregamentos atuantes. O programa apresentará opções de altura compatíveis com o vão informado. Após selecionar uma delas, realizará os cálculos e apresentará as armaduras necessárias e as verificações normativas. O usuário também poderá selecionar outra altura sugerida e comparar os resultados obtidos.
+Como exemplo de uso, o usuário poderá informar a largura da seção, a altura da seção, os valores de d e d', o cobrimento da viga e outras propriedades relevantes para o cálculo da armadura longitudinal. Uma vez informadas, o programa calculará os parâmetros relevantes e, no avançar, informará os valores calculados para área da armadura longitudinal da viga nas condições informadas.
 
 ## Exemplos
 
@@ -46,7 +46,7 @@ poetry run pytest
 ```text
 .
 ├── src/
-│   └── nome_do_projeto/
+│   └── VerificaEstCa/
 ├── tests/
 ├── exemplos/
 ├── docs/

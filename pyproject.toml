@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "nome_do_projeto"
-version = "0.1.0"
-description = ""
-authors = ["Nome do Autor <email@example.com>"]
+name = "VerificaEstCA"
+version = "1.0.4"
+description = "Programa para o cálculo das armaduras longitudinais de uma viga de concreto armado de geometria retangular"
+authors = ["Caio Guimarães <caio@biscaino.com,br>", "Isadora Daniel <isadsantos03@gmail.com>", "João Ballardin <joaoballardin2292@gmail.com>]
 license = "MIT"
 readme = "README.md"
-packages = [{ include = "nome_do_projeto", from = "src" }]
+packages = [{ include = "VerificaEstCA", from = "src" }]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
