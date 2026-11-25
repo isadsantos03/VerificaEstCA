@@ -4,7 +4,7 @@ from math import isfinite, log, sqrt
 
 # Cria a janela principal
 janela = tela.Tk()
-janela.title("INTERFACE PARA CÁLCULO DE VIGAS")
+janela.title("INTERFACE PARA DIMENSIONAMENTO DAS ARMADURAS DE VIGAS DE CONCRETO ARMADO")
 
 # Lista de itens que o usuário deve preencher
 campos = [
@@ -14,7 +14,7 @@ campos = [
     "Distância da fibra comprimida ao CG - d' (cm):",
     "Cobrimento - c (cm):",
     "Resistência Característica do Concreto - fck (MPa):",
-    "Momento de Cálculo - Mk (kN*cm):"]
+    "Momento Característico - Mk (kN*m):"]
 
 # Lista de mensagens de erro para cada campo
 erro = [
@@ -152,10 +152,10 @@ def tela_final():
         return as1 + delta_as, as_compressao, as_compressao > as1
 
     exibir("Momento de Cálculo e Momento-Limite:", font=("Arial", 12, "bold"))
-    exibir(f"Md: {md:.2f} kN·cm")
-    exibir(f"Mdlim: {mdlim:.2f} kN·cm")
+    exibir(f"Md: {md / 100:.2f} kN·m")
+    exibir(f"Mdlim: {mdlim / 100:.2f} kN·m")
     exibir("Caso de Armadura Simples" if md <= mdlim else "Caso de Armadura Dupla")
-
+    
     exibir("Valores de Armadura:", font=("Arial", 12, "bold"))
 
     armadura = calcular_armadura(md)
@@ -178,11 +178,21 @@ def tela_final():
         erro_dimensionamento()
         return
 
-    asmincalc = armadura_minima[0]
+    asmincalc, as_compressao_minima, minimo_subdimensionado = armadura_minima
+
     asmin = max(asmincalc, 0.0015 * bw * h)
     exibir(f"Asmin: {asmin:.2f} cm²")
 
+    if md <= mdlim < mdmin:
+        exibir("O momento mínimo exige armadura dupla.")
+
+    if secao_subdimensionada or minimo_subdimensionado:
+        exibir("A seção está subdimensionada", font=("Arial", 9))
+
     asfinal = max(as_tracao, asmin)
+    as_compressao_final = max(as_compressao, as_compressao_minima)
+
+    exibir(f"Armadura de compressão adotada (As′): {as_compressao_final:.2f} cm²")
     resultado = f"Valor de Armadura adotado: {asfinal:.2f} cm²"
 
     if asfinal + as_compressao > 0.04 * bw * h:
@@ -229,7 +239,7 @@ def tela_parametros():
     fyd = fyd_por_classe[ca]
 
     sigma_cd = alfa_c * eta_c * fcd
-    epsilon_yd = fyd / 210000
+    epsilon_yd = fyd / 21000
 
     #
     parametros_calculo.update({
@@ -257,7 +267,10 @@ def tela_parametros():
 
     # Exibe os dados da viga
     rotulos = campos + ["Resistência de Escoamento do Aço - fyk (MPa):"]
-    for rotulo, valor in zip(rotulos, viga):
+    valores_resumo = viga.copy()
+    valores_resumo[6] /= 100  # Converte o momento informado em kN*cm para kN*m
+
+    for rotulo, valor in zip(rotulos, valores_resumo):
       tela.Label(janela, text=f"{rotulo} {valor}").pack(
         anchor = "w", padx = 15
       )
@@ -305,7 +318,7 @@ def clicar():
         continue
 
       if i == 6:
-         valor = abs(valor)
+         valor = abs(valor) * 100  # Converte o momento informado em kN*m para kN*cm
 
       avisos[i].config(text="")
       valores.append(valor)               # Coleta os valores informados em 1-7
@@ -318,6 +331,23 @@ def clicar():
     aviso_aco.config(text="")
 
     if len(valores) == len(entradas):
+      h = valores[1]
+      d = valores[2]
+      d_linha = valores[3]
+
+      altura_util_invalida = d >= h
+      distancia_comprimida_invalida = d_linha >= d
+
+      if altura_util_invalida:
+        avisos[2].config(
+            text="⚠️ Erro: A altura útil d deve ser menor que h."
+        )
+
+      if distancia_comprimida_invalida:
+        avisos[3].config(
+            text="⚠️ Erro: A distância d′ deve ser menor que d."
+        )
+
       valores.append(classe_aco)          # Coleta a classe informado em 8
       viga[:] = valores
 
